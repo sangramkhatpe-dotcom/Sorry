@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Official Peace Treaty 🌼 From Sangram</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(145deg, #fefae0 0%, #edf7ed 35%, #e8f4f8 70%, #fdf2f8 100%);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .fun-font { font-family: 'Fredoka', cursive; }
+
+    /* Falling Petals Animation */
+    .petal {
+      position: fixed;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.85;
+      animation: floatPetal 11s linear infinite;
+    }
+    @keyframes floatPetal {
+      0% { transform: translateY(-10vh) translateX(0) rotate(0deg) scale(0.8); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(110vh) translateX(100px) rotate(360deg) scale(1.1); opacity: 0; }
+    }
+
+    /* Ambient floral stickers */
+    .flower-bob {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      animation: gentleSway 5s ease-in-out infinite alternate;
+    }
+    @keyframes gentleSway {
+      0% { transform: translateY(0px) rotate(-6deg); }
+      100% { transform: translateY(-16px) rotate(8deg); }
+    }
+
+    /* Mascot Animations */
+    @keyframes earSway {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(7deg); }
+    }
+    @keyframes flowerCrownWiggle {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-2px) rotate(2deg); }
+    }
+    @keyframes tearDrip {
+      0% { transform: translateY(0) scale(1); opacity: 0.8; }
+      80% { transform: translateY(10px) scale(1.1); opacity: 1; }
+      100% { transform: translateY(18px) scale(0.2); opacity: 0; }
+    }
+    @keyframes happyHop {
+      0%, 100% { transform: translateY(0) scale(1); }
+      30% { transform: translateY(-18px) scale(1.06); }
+      60% { transform: translateY(0) scale(0.96); }
+    }
+
+    .ear-left { transform-origin: 60px 65px; animation: earSway 3s ease-in-out infinite; }
+    .ear-right { transform-origin: 160px 65px; animation: earSway 3s ease-in-out infinite reverse; }
+    .flower-crown { transform-origin: center; animation: flowerCrownWiggle 2.8s ease-in-out infinite; }
+    .mascot-tear { animation: tearDrip 2s infinite ease-in; }
+    .hop-celebrate { animation: happyHop 0.75s ease-in-out 3; }
+
+    /* Frosted glass floral container */
+    .floral-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 3px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 16px 36px -10px rgba(101, 163, 13, 0.12), 0 10px 24px -6px rgba(244, 114, 182, 0.14);
+    }
+
+    /* Stamped voucher animation */
+    .stamp-badge {
+      transform: rotate(-14deg) scale(0);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .redeemed .stamp-badge {
+      transform: rotate(-14deg) scale(1);
+    }
+    .redeemed {
+      background: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    /* Slider styling */
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      background: #10b981;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body class="text-slate-800 flex flex-col items-center justify-start p-4 sm:p-6 relative">
+
+  <!-- Floating Botanical Accents -->
+  <div class="flower-bob top-6 left-6 text-3xl opacity-80">🌼</div>
+  <div class="flower-bob top-24 right-8 text-3xl opacity-75" style="animation-delay: -2s;">🌸</div>
+  <div class="flower-bob bottom-36 left-8 text-3xl opacity-75" style="animation-delay: -3.5s;">🌷</div>
+  <div class="flower-bob bottom-12 right-10 text-3xl opacity-75" style="animation-delay: -1.2s;">🌻</div>
+  <div class="flower-bob top-1/2 left-4 text-2xl opacity-60" style="animation-delay: -4s;">🌿</div>
+  <div class="flower-bob top-2/3 right-4 text-2xl opacity-60" style="animation-delay: -1.8s;">🧋</div>
+
+  <!-- Container for falling animated petals -->
+  <div id="petalShower" class="pointer-events-none fixed inset-0 overflow-hidden z-0"></div>
+
+  <!-- Header Banner -->
+  <header class="w-full max-w-xl mx-auto text-center pt-3 pb-2 z-10">
+    <div class="inline-flex items-center gap-2 bg-emerald-100/90 text-emerald-800 px-4 py-1.5 rounded-full text-xs sm:text-sm font-black mb-2 shadow-sm border-2 border-emerald-300">
+      <span>🌼</span> OFFICIAL BESTIE PEACE TREATY <span>🤝</span>
+    </div>
+    
+    <div class="mt-1">
+      <h1 class="fun-font text-4xl sm:text-5xl font-extrabold text-emerald-700 tracking-tight">
+        Dear Prachiti 🌸
+      </h1>
+    </div>
+    <p class="text-xs sm:text-sm text-slate-500 font-bold mt-2">Sangram sent a special floral peace ambassador!</p>
+  </header>
+
+  <main class="w-full max-w-xl mx-auto flex flex-col items-center gap-6 z-10 pb-20 mt-4">
+
+    <!-- Kawaii Floral Mascot (Flower Crown Pup) -->
+    <div class="relative cursor-pointer select-none flex flex-col items-center" id="mascotBuddy" onclick="pokeMascot()" title="Click for a gentle squeak!">
+      <svg width="220" height="210" viewBox="0 0 220 210" class="filter drop-shadow-md hover:scale-105 active:scale-95 transition-transform duration-200">
+        <!-- Soft Floral Glow -->
+        <circle cx="110" cy="110" r="95" fill="#fef08a" opacity="0.35" />
+        
+        <!-- Ears with Floral Hairpins -->
+        <g class="ear-left">
+          <ellipse cx="60" cy="88" rx="20" ry="38" transform="rotate(-25 60 88)" fill="#fde68a" stroke="#d97706" stroke-width="3" />
+          <ellipse cx="60" cy="90" rx="12" ry="24" transform="rotate(-25 60 90)" fill="#fef3c7" />
+        </g>
+        <g class="ear-right">
+          <ellipse cx="160" cy="88" rx="20" ry="38" transform="rotate(25 160 88)" fill="#fde68a" stroke="#d97706" stroke-width="3" />
+          <ellipse cx="160" cy="90" rx="12" ry="24" transform="rotate(25 160 90)" fill="#fef3c7" />
+        </g>
+
+        <!-- Chubby Body -->
+        <ellipse cx="110" cy="148" rx="52" ry="40" fill="#fef08a" stroke="#d97706" stroke-width="3.5" />
+        <ellipse cx="110" cy="150" rx="34" ry="26" fill="#ffffff" />
+
+        <!-- Head -->
+        <circle cx="110" cy="96" r="48" fill="#fef08a" stroke="#d97706" stroke-width="3.5" />
+        <ellipse cx="110" cy="107" rx="28" ry="20" fill="#ffffff" />
+
+        <!-- Rosy Blush Cheeks -->
+        <ellipse cx="78" cy="108" rx="9" ry="6" fill="#fbcfe8" opacity="0.9" />
+        <ellipse cx="142" cy="108" rx="9" ry="6" fill="#fbcfe8" opacity="0.9" />
+
+        <!-- Eyes (Sorry Puppy Eyes vs Happy Sparkle Eyes) -->
+        <g id="eyesDefault">
+          <circle cx="88" cy="88" r="7.5" fill="#1e293b" />
+          <circle cx="90.5" cy="85.5" r="2.8" fill="#ffffff" />
+          <circle cx="86" cy="90.5" r="1.4" fill="#ffffff" />
+
+          <circle cx="132" cy="88" r="7.5" fill="#1e293b" />
+          <circle cx="134.5" cy="85.5" r="2.8" fill="#ffffff" />
+          <circle cx="130" cy="90.5" r="1.4" fill="#ffffff" />
+
+          <!-- Tiny sad cute tear drops -->
+          <ellipse id="mascotTear" class="mascot-tear" cx="79" cy="116" rx="2.5" ry="4" fill="#38bdf8" />
+        </g>
+
+        <g id="eyesExcited" style="display: none;">
+          <path d="M 80 90 Q 88 80 96 90" fill="none" stroke="#065f46" stroke-width="4.5" stroke-linecap="round" />
+          <path d="M 124 90 Q 132 80 140 90" fill="none" stroke="#065f46" stroke-width="4.5" stroke-linecap="round" />
+          <text x="88" y="76" font-size="14" text-anchor="middle">✨</text>
+          <text x="132" y="76" font-size="14" text-anchor="middle">✨</text>
+        </g>
+
+        <!-- Cute black nose -->
+        <ellipse cx="110" cy="101" rx="5" ry="3.5" fill="#1e293b" />
+
+        <!-- Mouth -->
+        <path id="mascotMouth" d="M 104 105 Q 107 103 110 104 Q 113 103 116 105" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" />
+
+        <!-- Kawaii Flower Crown -->
+        <g class="flower-crown">
+          <path d="M 72 66 Q 110 58 148 66" fill="none" stroke="#4ade80" stroke-width="4" stroke-linecap="round" />
+          <circle cx="80" cy="62" r="5" fill="#fde047" stroke="#ffffff" stroke-width="3" />
+          <circle cx="98" cy="58" r="6" fill="#fde047" stroke="#ffffff" stroke-width="4" />
+          <circle cx="118" cy="58" r="6" fill="#f472b6" stroke="#ffffff" stroke-width="3.5" />
+          <circle cx="138" cy="64" r="5" fill="#fde047" stroke="#ffffff" stroke-width="3" />
+        </g>
+
+        <!-- Apology Sign Board -->
+        <g id="apologyBoard">
+          <rect x="44" y="132" width="132" height="46" rx="12" fill="#ffffff" stroke="#10b981" stroke-width="3" />
+          <text x="110" y="152" font-family="'Fredoka', sans-serif" font-weight="700" font-size="12.5" fill="#047857" text-anchor="middle">I'M SO SORRY!</text>
+          <text x="110" y="168" font-family="'Nunito', sans-serif" font-weight="900" font-size="10.5" fill="#d97706" text-anchor="middle">🌼 Pls forgive him 🌼</text>
+          <!-- Paws holding sign -->
+          <ellipse cx="58" cy="135" rx="8" ry="7" fill="#ffffff" stroke="#d97706" stroke-width="2.5" />
+          <ellipse cx="162" cy="135" rx="8" ry="7" fill="#ffffff" stroke="#d97706" stroke-width="2.5" />
+        </g>
+      </svg>
+
+      <div id="mascotSpeech" class="text-center font-bold text-xs sm:text-sm text-emerald-800 bg-white/95 border-2 border-emerald-200 px-5 py-2 rounded-full shadow -mt-2 transition-all">
+        "Sangram sent me with this flower crown to beg for peace! 🌼"
+      </div>
+    </div>
+
+    <!-- Sangram's Apology Letter Card -->
+    <section class="floral-card w-full rounded-3xl p-5 sm:p-7 relative overflow-hidden">
+      <div class="flex items-center justify-between border-b-2 border-emerald-100 pb-3 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">💌</span>
+          <h2 class="fun-font text-xl sm:text-2xl font-bold text-emerald-800">Peace Note from Sangram</h2>
+        </div>
+        <span class="text-xs font-black bg-amber-100 text-amber-800 px-3 py-1 rounded-full border border-amber-300">
+          🌼 100% Platonic Bestie Vows
+        </span>
+      </div>
+
+      <div class="relative bg-emerald-50/50 rounded-2xl p-4 sm:p-5 border border-emerald-200">
+        <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-semibold">
+          "I am so sorry Prachiti. I know I messed up and acted like a total goofball. Our friendship is way too precious, fun, and chaotic to let this ruin the vibe. You are an absolute top-tier bestie who deserves all the daisies and good energy in the world. I promise to be better and stop being annoying. Please forgive me?"
+        </p>
+        <div class="mt-4 flex items-center justify-end gap-2">
+          <span class="text-sm font-bold text-slate-500">With lots of peace & snacks,</span>
+          <span class="fun-font text-lg sm:text-xl font-extrabold text-emerald-700">Sangram 🌿</span>
+        </div>
+      </div>
+
+      <!-- Playful Action Buttons Arena -->
+      <div class="relative w-full h-32 flex items-center justify-center bg-emerald-50/70 rounded-2xl border-2 border-dashed border-emerald-200 p-2 mt-5 overflow-hidden" id="playGround">
+        
+        <button id="forgiveBtn" onclick="forgiveAction()" class="fun-font bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 px-6 rounded-2xl shadow-lg shadow-emerald-200 hover:scale-105 active:scale-95 transition-all duration-300 text-sm sm:text-base flex items-center gap-2 z-20" style="transform: scale(1);">
+          <span>Forgive Sangram! 🌸</span>
+        </button>
+
+        <button id="dodgeBtn" onmouseover="dodgeButton()" ontouchstart="dodgeButton(event)" class="fun-font bg-amber-200 text-amber-900 font-bold py-2 px-4 rounded-xl shadow transition-all duration-200 text-xs sm:text-sm whitespace-nowrap absolute select-none z-10 cursor-pointer border border-amber-300">
+          Still Annoyed 😤
+        </button>
+
+      </div>
+      <div id="dodgeComment" class="text-center text-xs font-black text-amber-700 mt-3 h-4 transition-opacity opacity-0"></div>
+    </section>
+
+    <!-- Flower Peace Offering Vouchers -->
+    <section class="floral-card w-full rounded-3xl p-5 sm:p-7 relative">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h2 class="fun-font text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+            <span>💐</span> Bestie Peace Vouchers
+          </h2>
+          <p class="text-xs text-slate-500 font-bold">Tap to claim legitimate friendship compensation from Sangram!</p>
+        </div>
+        <span id="voucherBadge" class="text-xs font-black bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full border border-emerald-300 whitespace-nowrap">
+          0/4 Claimed
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="vouchersGrid">
+        
+        <div class="voucher border-2 border-dashed border-emerald-300 rounded-2xl p-4 bg-white/95 hover:bg-emerald-50/60 cursor-pointer transition relative flex flex-col justify-between" onclick="claimVoucher(this)">
+          <div class="flex items-start justify-between">
+            <span class="text-2xl">🧋🌸</span>
+            <span class="stamp-badge absolute right-3 top-3 bg-emerald-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md shadow">REDEEMED</span>
+          </div>
+          <div>
+            <h3 class="fun-font font-bold text-slate-800 text-sm mt-1">Boba & Treat Trip</h3>
+            <p class="text-xs text-slate-600 font-medium">Sangram buys your favorite drink & sweet treat, no questions asked!</p>
+          </div>
+        </div>
+
+        <div class="voucher border-2 border-dashed border-emerald-300 rounded-2xl p-4 bg-white/95 hover:bg-emerald-50/60 cursor-pointer transition relative flex flex-col justify-between" onclick="claimVoucher(this)">
+          <div class="flex items-start justify-between">
+            <span class="text-2xl">🌼🎧</span>
+            <span class="stamp-badge absolute right-3 top-3 bg-emerald-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md shadow">REDEEMED</span>
+          </div>
+          <div>
+            <h3 class="fun-font font-bold text-slate-800 text-sm mt-1">1-Hour Rant Pass</h3>
+            <p class="text-xs text-slate-600 font-medium">Sangram listens attentively to any rant with 0 interruptions and 100% agreement.</p>
+          </div>
+        </div>
+
+        <div class="voucher border-2 border-dashed border-emerald-300 rounded-2xl p-4 bg-white/95 hover:bg-emerald-50/60 cursor-pointer transition relative flex flex-col justify-between" onclick="claimVoucher(this)">
+          <div class="flex items-start justify-between">
+            <span class="text-2xl">🌷🍕</span>
+            <span class="stamp-badge absolute right-3 top-3 bg-emerald-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md shadow">REDEEMED</span>
+          </div>
+          <div>
+            <h3 class="fun-font font-bold text-slate-800 text-sm mt-1">Emergency Snack Delivery</h3>
+            <p class="text-xs text-slate-600 font-medium">On-demand comfort food delivery funded completely by Sangram.</p>
+          </div>
+        </div>
+
+        <div class="voucher border-2 border-dashed border-emerald-300 rounded-2xl p-4 bg-white/95 hover:bg-emerald-50/60 cursor-pointer transition relative flex flex-col justify-between" onclick="claimVoucher(this)">
+          <div class="flex items-start justify-between">
+            <span class="text-2xl">🌻🤞</span>
+            <span class="stamp-badge absolute right-3 top-3 bg-emerald-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md shadow">REDEEMED</span>
+          </div>
+          <div>
+            <h3 class="fun-font font-bold text-slate-800 text-sm mt-1">Total Immunity Oath</h3>
+            <p class="text-xs text-slate-600 font-medium">Sangram promises never to make this mistake again, sworn under the flower council!</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Chill-o-Meter / Forgiveness Slider -->
+    <section class="floral-card w-full rounded-3xl p-5 sm:p-7 text-center">
+      <div class="flex items-center justify-center gap-2 mb-1">
+        <span class="text-2xl">🌻</span>
+        <h2 class="fun-font text-xl sm:text-2xl font-bold text-emerald-800">The Grudge-o-Meter</h2>
+      </div>
+      <p class="text-xs text-slate-500 font-bold mb-5">Prachiti, slide to rate your current chill level toward Sangram:</p>
+
+      <div class="px-3">
+        <input id="chillSlider" type="range" min="0" max="100" value="25" class="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500 transition-all" oninput="updateMeter()">
+      </div>
+
+      <div class="flex justify-between text-[11px] font-extrabold text-slate-400 mt-2 px-1">
+        <span>0% (Big Mad)</span>
+        <span>50% (Slightly Annoyed)</span>
+        <span>100% (Sangram Forgiven!)</span>
+      </div>
+
+      <div class="mt-5 p-4 rounded-2xl bg-white border-2 border-emerald-200 inline-block w-full max-w-sm shadow-sm">
+        <div id="meterEmoji" class="text-4xl mb-1">😾</div>
+        <div id="meterPercentage" class="fun-font text-2xl font-black text-emerald-600">25% Chill</div>
+        <p id="meterVerdict" class="text-xs sm:text-sm font-extrabold text-slate-600 mt-0.5">"Giving Sangram the silent treatment..."</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // --- Web Audio API Setup for Cute Sounds ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = new AudioContext();
+
+    function playTone(frequency, type, duration, volumeLevel = 0.1) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+      
+      gainNode.gain.setValueAtTime(volumeLevel, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + duration);
+    }
+
+    function playSqueak() {
+      playTone(800, 'sine', 0.1, 0.05);
+      setTimeout(() => playTone(1200, 'sine', 0.15, 0.05), 100);
+    }
+
+    function playBoing() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    }
+
+    function playStamp() {
+      playTone(150, 'square', 0.1, 0.1);
+      setTimeout(() => playTone(200, 'square', 0.1, 0.05), 50);
+    }
+
+    function playVictory() {
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+      notes.forEach((note, index) => {
+        setTimeout(() => playTone(note, 'sine', 0.3, 0.1), index * 150);
+      });
+    }
+
+    // --- Falling Petals Animation ---
+    const petalShower = document.getElementById('petalShower');
+    const flowers = ['🌸', '🌼', '🌿', '🤍'];
+    
+    function createPetal() {
+      const petal = document.createElement('div');
+      petal.classList.add('petal');
+      petal.innerText = flowers[Math.floor(Math.random() * flowers.length)];
+      petal.style.left = Math.random() * 100 + 'vw';
+      petal.style.fontSize = (Math.random() * 15 + 10) + 'px';
+      petal.style.animationDuration = (Math.random() * 5 + 8) + 's';
+      petalShower.appendChild(petal);
+      
+      setTimeout(() => {
+        petal.remove();
+      }, 13000);
+    }
+    setInterval(createPetal, 400);
+
+    // --- Mascot Interaction ---
+    function pokeMascot() {
+      playSqueak();
+      const mascot = document.getElementById('mascotBuddy');
+      mascot.classList.add('scale-110');
+      setTimeout(() => mascot.classList.remove('scale-110'), 200);
+      
+      const speeches = [
+        "Sangram is super sorry! 🥺",
+        "Please accept these flowers! 🌼",
+        "He promised to buy snacks! 🍕",
+        "He's just a silly goofy guy! 🤷‍♂️",
+        "Peace treaty? 🤝"
+      ];
+      document.getElementById('mascotSpeech').innerText = `"${speeches[Math.floor(Math.random() * speeches.length)]}"`;
+    }
+
+    // --- Runaway Button Logic ---
+    let dodgeCount = 0;
+    let forgiveScale = 1;
+    const excuses = [
+      "Nope! 🏃‍♀️", "Too slow! 💨", "Still annoyed! 😤", 
+      "Try harder Sangram! 🙄", "Snacks needed! 🍕", 
+      "Not forgiving yet! 🚫", "Error: Grudge active! 🤖"
+    ];
+
+    function dodgeButton(e) {
+      if(e) e.preventDefault(); // Prevent touch from clicking
+      const btn = document.getElementById('dodgeBtn');
+      const playground = document.getElementById('playGround');
+      const forgiveBtn = document.getElementById('forgiveBtn');
+      const comment = document.getElementById('dodgeComment');
+      
+      playBoing();
+      
+      // Calculate random position within playground
+      const maxX = playground.clientWidth - btn.clientWidth - 20;
+      const maxY = playground.clientHeight - btn.clientHeight - 20;
+      
+      const newX = Math.random() * maxX;
+      const newY = Math.random() * maxY;
+      
+      btn.style.left = `${newX}px`;
+      btn.style.top = `${newY}px`;
+      
+      // Change text
+      btn.innerText = excuses[Math.floor(Math.random() * excuses.length)];
+      
+      // Update comment
+      comment.innerText = `Prachiti dodged! (x${dodgeCount + 1})`;
+      comment.classList.remove('opacity-0');
+      
+      // Grow forgive button and shrink dodge button slightly
+      dodgeCount++;
+      if(dodgeCount < 10) {
+        forgiveScale += 0.1;
+        forgiveBtn.style.transform = `scale(${forgiveScale})`;
+        let currentBtnScale = 1 - (dodgeCount * 0.05);
+        btn.style.transform = `scale(${currentBtnScale})`;
+      } else {
+        btn.style.display = 'none';
+        comment.innerText = "Okay, Sangram wins. You HAVE to forgive him now! 😂";
+      }
+    }
+
+    // Initialize dodge button position
+    window.onload = () => {
+      const btn = document.getElementById('dodgeBtn');
+      btn.style.left = '60%';
+      btn.style.top = '40%';
+      
+      // Pre-fill a few petals
+      for(let i=0; i<5; i++) setTimeout(createPetal, i*200);
+    };
+
+    // --- Forgive Logic ---
+    function forgiveAction() {
+      playVictory();
+      
+      // Confetti burst
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#fde047', '#f472b6', '#ffffff']
+      });
+
+      // Update UI
+      document.getElementById('forgiveBtn').innerHTML = "<span>YAY! Peace Restored! 🌻🤝</span>";
+      document.getElementById('dodgeBtn').style.display = 'none';
+      document.getElementById('dodgeComment').innerText = "Sangram is officially forgiven! Besties forever! 🎉";
+      document.getElementById('dodgeComment').classList.remove('opacity-0', 'text-amber-700');
+      document.getElementById('dodgeComment').classList.add('text-emerald-600');
+
+      // Update mascot
+      document.getElementById('eyesDefault').style.display = 'none';
+      document.getElementById('mascotTear').style.display = 'none';
+      document.getElementById('eyesExcited').style.display = 'block';
+      document.getElementById('mascotMouth').setAttribute('d', 'M 100 102 Q 110 115 120 102');
+      document.getElementById('mascotBuddy').classList.add('hop-celebrate');
+      document.getElementById('apologyBoard').style.display = 'none';
+      document.getElementById('mascotSpeech').innerText = "YAY! SANGRAM IS SAVED! 🌻🎉";
+      
+      // Max out slider
+      document.getElementById('chillSlider').value = 100;
+      updateMeter();
+    }
+
+    // --- Voucher Logic ---
+    let claimedVouchers = 0;
+    function claimVoucher(element) {
+      if(element.classList.contains('redeemed')) return;
+      
+      playStamp();
+      element.classList.add('redeemed');
+      
+      // Mini confetti on the voucher
+      const rect = element.getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+      
+      confetti({
+        particleCount: 30,
+        spread: 50,
+        origin: { x, y },
+        colors: ['#10b981', '#fde047']
+      });
+
+      claimedVouchers++;
+      document.getElementById('voucherBadge').innerText = `${claimedVouchers}/4 Claimed`;
+      
+      if(claimedVouchers === 4) {
+        document.getElementById('voucherBadge').innerText = "All Snacks Secured! 🍕";
+        document.getElementById('voucherBadge').classList.add('bg-amber-300', 'text-amber-900', 'border-amber-400');
+      }
+    }
+
+    // --- Slider Logic ---
+    function updateMeter() {
+      const val = parseInt(document.getElementById('chillSlider').value);
+      const percentage = document.getElementById('meterPercentage');
+      const emoji = document.getElementById('meterEmoji');
+      const verdict = document.getElementById('meterVerdict');
+      
+      // Play soft tick sound while dragging
+      if(val % 5 === 0) playTone(400 + val*2, 'sine', 0.05, 0.02);
+
+      percentage.innerText = `${val}% Chill`;
+      
+      if (val < 20) {
+        emoji.innerText = "😾";
+        verdict.innerText = "Big Mad. Sangram is in the doghouse.";
+      } else if (val < 50) {
+        emoji.innerText = "😒";
+        verdict.innerText = "Slightly annoyed. Bring more snacks.";
+      } else if (val < 80) {
+        emoji.innerText = "🤔";
+        verdict.innerText = "Warming up. The flowers are helping.";
+      } else if (val < 100) {
+        emoji.innerText = "😌";
+        verdict.innerText = "Almost there. One more boba should do it.";
+      } else {
+        emoji.innerText = "🥰";
+        verdict.innerText = "100% Chill! Friendship completely restored! 🤝";
+        if(document.getElementById('dodgeBtn').style.display !== 'none') {
+           // Auto-forgive if slider maxed
+           forgiveAction(); 
+        }
+      }
+    }
+  </script>
+</body>
+</html>
